@@ -6,7 +6,7 @@ from models import Doctor, DoctorSpecialty, DoctorCenter
 from database import SessionLocal
 
 # Load your cleaned CSV
-df = pd.read_csv("sanitas_doctores_clean.csv", dtype=str).fillna("")
+df = pd.read_csv("backend/sanitas_doctores_clean.csv", dtype=str).fillna("")
 
 def none(v):
     return None if (v is None or v == "" or (isinstance(v, float) and math.isnan(v))) else v
