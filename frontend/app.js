@@ -1,6 +1,5 @@
-// ==== CONFIG ====
 const API_URL = (
-  localStorage.getItem("apiUrl") || "http://localhost:8000"
+  localStorage.getItem("apiUrl") || "https://sanitas-ai-assistant.onrender.com"
 ).replace(/\/$/, "");
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("apiUrlLabel").textContent = API_URL;
