@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doctor Matcher – Chat Demo</title>
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div class="title">Doctor Matcher • Chat</div>
+        <div class="pill" id="status">READY</div>
+      </header>
+
+      <div class="disclaimer" id="disclaimer">
+        Type a message describing your symptoms. This tool helps route you to a suitable specialist and is not medical advice.
+        If this is an emergency, call local services.
+      </div>
+
+      <div id="chips" class="chips" style="display:none"></div>
+      <div id="chat" aria-live="polite"></div>
+      <div id="results" class="results" style="display:none"></div>
+
+      <div class="inputbar">
+        <textarea id="input" placeholder="e.g., I have sharp chest pain and shortness of breath when climbing stairs"
+                  onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
+        <button id="sendBtn" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      API URL: <code id="apiUrlLabel"></code> · Simple demo page
+    </div>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

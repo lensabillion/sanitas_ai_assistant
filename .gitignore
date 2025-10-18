@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Secrets
+.env
+*.key
+*.pem
+
+# Databases (keep private unless you explicitly want them public)
+*.db
+
+# CSVs (keep private by default; un-ignore specific ones if needed)
+*.csv
+!backend/sanitas_doctores_clean.csv  # allow this one if you want it public
+
+# OS/IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
