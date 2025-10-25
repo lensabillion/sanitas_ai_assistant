@@ -2,5 +2,12 @@ fastapi
 uvicorn
 sqlalchemy
 pandas
-openai
+pydantic
 python-dotenv
+joblib
+openai
+
+# ML stack compatible with Python 3.12
+numpy
+scipy
+scikit-learn
