@@ -1,3 +1,4 @@
+# backend/main.py
 import os, json, unicodedata
 from typing import List, Set, Dict
 from fastapi import FastAPI, Depends, HTTPException
@@ -8,6 +9,7 @@ from sqlalchemy import func, select
 
 from database import SessionLocal
 from models import Doctor, DoctorSpecialty
+from analytics import router as symptoms_router
 
 # --- Optional: load .env from project root or backend folder ---
 try:
@@ -21,6 +23,13 @@ from openai import OpenAI
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
+print("Pinging OpenAI /models …")
+
+try:
+    client.models.list()
+    print("API key works and has access.")
+except Exception as e:
+    print(e)
 app = FastAPI(title="Doctor Matcher API")
 
 # Allow frontend (any origin while developing)
@@ -31,6 +40,8 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=True,
 )
+app.include_router(symptoms_router)
+
 
 # ---------- DB dependency ----------
 def get_db():
@@ -134,7 +145,15 @@ def _top3_from_resolved(db: Session, resolved_labels: Set[str]):
 @app.get("/")
 def home():
     return {"message": "Doctor Matcher API is running"}
-
+@app.get("/diag/openai")
+def diag_openai():
+    import os
+    key = os.getenv("OPENAI_API_KEY", "")
+    suffix = key[-6:] if key else ""
+    return {
+        "has_key": bool(key),
+        "key_suffix": suffix,   # last 6 chars only (safe)
+    }
 @app.post("/triage")
 def triage(req: MatchRequest, db: Session = Depends(get_db)):
     """
