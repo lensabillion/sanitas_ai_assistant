@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Symptom Clusters</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="title">
+      <h1>Symptom Clusters</h1>
+      <div class="subtitle">Operational view for non-technical staff</div>
+    </div>
+    <div class="controls">
+      <label>Days
+        <select id="days">
+          <option value="7">7</option>
+          <option value="14">14</option>
+          <option value="30" selected>30</option>
+        </select>
+      </label>
+
+      <!-- Former “k” renamed to Grouping with friendly labels -->
+      <label>Grouping
+        <select id="grouping">
+          <option value="auto" selected>Auto</option>
+          <option value="4">Few (4)</option>
+          <option value="6">Standard (6)</option>
+          <option value="8">More (8)</option>
+          <option value="12">Detailed (12)</option>
+        </select>
+      </label>
+
+      <button id="refreshBtn" class="btn primary">Refresh</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="kpis">
+      <div class="card kpi"><div class="kpi-value" id="kpiCases">—</div><div class="kpi-label">Cases</div></div>
+      <div class="card kpi"><div class="kpi-value" id="kpiClusters">—</div><div class="kpi-label">clusters</div></div>
+    </section>
+
+    <section class="card panel">
+      <div class="panel-head">
+        <h2>Cluster Distribution</h2>
+        <span class="muted">Top symptoms by number of cases</span>
+      </div>
+      <!-- Vertical bar chart -->
+      <canvas id="barCanvas" height="280" aria-label="Cluster distribution"></canvas>
+      <div id="barLegend" class="legend"></div>
+    </section>
+
+    <section class="grid" id="clusterGrid" aria-live="polite"></section>
+
+    <section id="emptyState" class="empty hidden">
+      <div class="empty-title">No symptom clusters for the selected dates.</div>
+      <div class="empty-desc">Try expanding the date range or adjusting the grouping.</div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>API base:</span>
+    <span id="apiUrlLabel">—</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

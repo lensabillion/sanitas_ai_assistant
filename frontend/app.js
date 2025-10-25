@@ -1,8 +1,10 @@
 const API_URL = (
   localStorage.getItem("apiUrl") || "https://sanitas-ai-assistant.onrender.com"
 ).replace(/\/$/, "");
+
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("apiUrlLabel").textContent = API_URL;
+  const lbl = document.getElementById("apiUrlLabel");
+  if (lbl) lbl.textContent = API_URL;
 });
 
 const chat = document.getElementById("chat");
@@ -80,7 +82,11 @@ async function sendMessage() {
   status.textContent = "WORKING";
   sendBtn.disabled = true;
 
+  // keep data in outer scope so we can safely reference it
+  let data = null;
+
   try {
+    // --- Call /triage ---
     const r = await fetch(`${API_URL}/triage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -92,13 +98,13 @@ async function sendMessage() {
       throw new Error(`HTTP ${r.status}: ${eText}`);
     }
 
-    const data = await r.json();
+    data = await r.json();
 
     // Update disclaimer if present
     const disclaim = document.getElementById("disclaimer");
-    if (data.disclaimer) disclaim.textContent = data.disclaimer;
+    if (disclaim && data.disclaimer) disclaim.textContent = data.disclaimer;
 
-    // Chips: prefer new key, fallback to old key (compat)
+    // If you want chips back later, uncomment:
     // showSpecialties(
     //   data.interpreted_specialties_es_in || data.interpreted_specialties || []
     // );
@@ -114,8 +120,30 @@ async function sendMessage() {
       (doctors.length
         ? "Here are a few doctors you can visit."
         : "I couldn’t find matching doctors. Try adding more detail (duration, severity, body area).");
-    console.error(err);
-    botNode.textContent = "Error: " + (err.message || err.toString());
+
+    // --- Log the symptom (fire-and-forget) ---
+    // "Symptom" if either interpreted or resolved lists are non-empty
+    const isSymptom =
+      (data.interpreted_specialties_es_in &&
+        data.interpreted_specialties_es_in.length > 0) ||
+      (data.resolved_specialties_in_db &&
+        data.resolved_specialties_in_db.length > 0);
+
+    if (isSymptom) {
+      fetch(`${API_URL}/symptoms/log`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text,
+          interpreted_specialties_es: data.interpreted_specialties_es_in || [],
+          resolved_specialties: data.resolved_specialties_in_db || [],
+          is_symptom_query: true,
+          force_english: true, // keep analytics English-only
+        }),
+      }).catch(() => {});
+    }
+  } catch (err) {
+    botNode.textContent = "Error: " + (err?.message || String(err));
   } finally {
     status.textContent = "READY";
     sendBtn.disabled = false;
@@ -125,16 +153,11 @@ async function sendMessage() {
 
 // Convenience: pre-fill input when page loads
 window.addEventListener("load", () => {
-  // Make sure input starts empty and shows its placeholder
   input.value = "";
-
-  // Friendly greeting from the assistant
   addMessage(
     "👋 Hello! I'm your virtual assistant here to help you find doctors based on your symptoms. " +
       "Describe what you're feeling, and I'll suggest specialists and nearby doctors for you.",
     "bot"
   );
-
-  // Keep status ready
   status.textContent = "READY";
 });

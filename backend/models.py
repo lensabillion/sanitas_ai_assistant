@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+# backend/models.py
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, JSON
 from sqlalchemy.orm import relationship, declarative_base
-
+from sqlalchemy.sql import func
 Base = declarative_base()
 
 class Doctor(Base):
@@ -33,3 +34,15 @@ class DoctorCenter(Base):
     center = Column(String)
 
     doctor = relationship("Doctor", back_populates="centers")
+
+class SymptomEvent(Base):
+    __tablename__ = "symptom_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(Text, nullable=False)              # original user text
+    text_en = Column(Text, nullable=True)            # optional English copy (see below)
+    interpreted_specialties_es = Column(JSON)        # list[str]
+    resolved_specialties = Column(JSON)              # list[str]
+    is_symptom_query = Column(Integer, nullable=False, default=1)  # 1/0
+    embedding = Column(Text, nullable=True)          # json.dumps(List[float])
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
